@@ -234,7 +234,7 @@ const AppointmentSystem = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-md">
-      <h1 className="text-3xl font-extrabold text-center text-blue-800 mb-16">ONLINE APPOINTMENTS</h1>
+      <h1 className="text-3xl font-extrabold text-center text-blue-800 my-10 underline">ONLINE APPOINTMENTS</h1>
 
       {/* Progress indicator */}
       <div className="flex justify-between items-center mb-8">
