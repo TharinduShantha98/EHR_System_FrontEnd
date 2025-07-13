@@ -8,6 +8,7 @@ const PatientDashboard = () => {
   const [activeTab, setActiveTab] = useState('records');
   const [loading, setLoading] = useState(true);
   const [greeting, setGreeting] = useState('');
+  const [nearbyHospitals, setNearbyHospitals] = useState<any>([]);
 
   // Sample Data
   const medicalRecords = [
@@ -24,11 +25,6 @@ const PatientDashboard = () => {
     { id: 1, doctor: 'Dr. Fernando', date: '2023-11-20', time: '10:30 AM', hospital: 'Nawaloka Hospital' },
   ];
 
-  const nearbyHospitals = [
-    { id: 1, name: 'National Hospital Colombo', distance: '1.2 km', address: 'Ananda Rajapakse Mawatha, Colombo', phone: '011-2691111' },
-    { id: 2, name: 'Asiri Surgical Hospital', distance: '3.5 km', address: 'No. 23, Union Place, Colombo', phone: '011-5188888' },
-    { id: 3, name: 'Lanka Hospital', distance: '4.8 km', address: '116,锦绣路, Colombo 03', phone: '011-2320202' },
-  ];
 
   // Simulate loading delay
   useEffect(() => {
@@ -37,6 +33,16 @@ const PatientDashboard = () => {
     setGreeting(hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening');
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    getAllHospitals();
+  }, []);
+
+  const getAllHospitals = async () => {
+    const response = await fetch(process.env.NEXT_PUBLIC_BASE_URL + `/location/allLocations`);
+    const data = await response.json();
+    setNearbyHospitals(data?.data);
+  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -158,7 +164,7 @@ const PatientDashboard = () => {
           <motion.div key="nearby" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             <h3 className="text-xl font-semibold text-gray-800 mb-4">Nearby Hospitals</h3>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {nearbyHospitals.map((hospital) => (
+              {nearbyHospitals.map((hospital: any) => (
                 <motion.div
                   key={hospital.id}
                   initial={{ y: 10, opacity: 0 }}
@@ -166,10 +172,10 @@ const PatientDashboard = () => {
                   transition={{ duration: 0.3 }}
                   className="p-4 bg-white rounded-lg shadow hover:shadow-lg border border-gray-100"
                 >
-                  <h4 className="font-medium text-gray-900">{hospital.name}</h4>
-                  <p className="text-sm text-gray-600">Distance: {hospital.distance}</p>
+                  <h4 className="font-medium text-gray-900">{hospital.hospitalName}</h4>
+                  <p className="text-sm text-gray-600">Distance: {hospital.district}</p>
                   <p className="text-sm text-gray-600 mt-1">{hospital.address}</p>
-                  <p className="text-sm text-gray-600 mt-1">📞 {hospital.phone}</p>
+                  <p className="text-sm text-gray-600 mt-1">📞 {hospital.postalCode}</p>
                   <button
                     onClick={() => window.open(`https://maps.google.com/?q= ${encodeURIComponent(hospital.name)}`, '_blank')}
                     className="mt-2 text-blue-600 hover:text-blue-800 text-sm font-medium"
@@ -237,11 +243,10 @@ const PatientDashboard = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${activeTab === tab.id
+                  ? 'border-blue-500 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
               >
                 {tab.name}
               </button>
